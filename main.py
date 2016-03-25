@@ -1,3 +1,21 @@
+"""
+Copyright (c) 2013-2016 Antonio de la Piedra, Alberto Caponi, Claudio Pisa
+Original code from Antonio de la Piedra: https://github.com/adelapie/irma_phase_2/tree/master/terminal
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+"""
+
 import hashlib
 
 from charm.core.math.integer import integer, randomBits
@@ -10,7 +28,7 @@ from idemix.verifier import Verifier
 
 context = integer(randomBits(lm))
 
-attr = {'1': 'alberto', '2': 'caponi', '3': 29}
+attr = {'1': 'student', '2': 'italian', '3': 'age'}
 for id, value in attr.iteritems():
     h_challenge = hashlib.new('sha256')
     h_challenge.update(str(value))
@@ -18,7 +36,7 @@ for id, value in attr.iteritems():
 
 issuer = Issuer(len(attr), 0, 0, secparam, context)
 pk_i, sk_i = issuer.gen_key_pair()
-# print pk_i
+# print sk_i
 assert issuer.selfTest()
 
 user = Recipient(pk_i, context)
@@ -38,7 +56,9 @@ sig, q2Check, c2Check = user.round_3(signature, P2, n2)
 # print "Nonce 2", n2
 # print "Signature", signature
 # print "P2", P2
-# print "Sig", sig
+print "Sig", sig
+print q2Check
+print c2Check
 
 credential = {'attributes': attr, 'signature': sig}
 predicate = []#attr.keys()
@@ -49,6 +69,7 @@ nv = verifier.get_nonce()
 # VERIFYING PROTOCOL
 proof = user.build_proof(credential, predicate, nv)
 
+print proof
 a = {}
 for id, value in credential["attributes"].iteritems():
     if id in predicate:
